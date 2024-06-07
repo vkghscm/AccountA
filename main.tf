@@ -81,12 +81,13 @@ resource "aws_iam_role" "ec2_role" {
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
-      Principal = {
-        Service = "ec2.amazonaws.com",
+    Statement = [
+    {
+     "Effect": "Allow",
+     "Principal": {
+      "AWS": "arn:aws:iam::590184045059:root"
       },
+      "Action": "sts:AssumeRole",
     }],
   })
 }
@@ -104,13 +105,21 @@ resource "aws_iam_role_policy" "ec2_role_policy" {
         Action   = "sns:Publish",
         Resource = aws_sns_topic.ServerA.arn,
       },
+      {
+        "Effect": "Allow",
+         "Action": [
+         "s3:*",
+         "s3-object-lambda:*"
+      ],
+         "Resource": "*"
+     },
     ],
   })
 }
 
 resource "aws_iam_instance_profile" "ec2_role" {
   provider = aws.AccountA
-  name     = "ec2_role"
+  name     = "ec2_publish_to_sns_policy"
   role     = aws_iam_role.ec2_role.name
 }
 
